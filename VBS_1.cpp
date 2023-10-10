@@ -169,10 +169,10 @@ void editDBase() {
 void getOmschrijving(char *omschrijving) {
     
     do {
-           fflush(stdin);
-           clearScreen();
+        fflush(stdin);     
            printf("Voer de omschrijving in (maximaal 20 karakters): ");
-           scanf(" %20[^\n]s", omschrijving);
+           scanf("%[^\n]s", omschrijving);
+           //printf("%s", omschrijving);
            if (strlen(omschrijving) > 20) {
                clearScreen();
                printf("Waarschuwing: Omschrijving mag maximaal 20 karakters bevatten. Probeer opnieuw.\n");
@@ -213,6 +213,8 @@ int makeProduct() {
 
         getOmschrijving(artikel.omschrijving);
         
+        fflush(stdin); 
+
         printf("Voer de prijs in: ");
         scanf("%lf", &artikel.prijs);
 
