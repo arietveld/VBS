@@ -3,10 +3,12 @@
 #include <stdlib.h>
 
 char filename[20];
+int artikelNummer;
+int update;
 
 struct Artikel {
     int artikelnummer;
-    char omschrijving[100];
+    char omschrijving[21];
     double prijs;
     int voorraad;
 };
@@ -34,6 +36,124 @@ void clearHigh() {
 printf("\e[H");
 }
 
+
+
+// Functie om de voorraadlijst af te drukken
+void printDbase() {
+    FILE *bestand;
+    struct Artikel artikel;
+
+    // Probeer het bestand te openen voor lezen ("r" modus)
+    bestand = fopen(filename, "r");
+
+    if (bestand == NULL) {
+        printf("Kan het bestand niet openen voor lezen.\n");
+        return;
+    }
+
+    clearScreen();
+    printf("Voorraadlijst:\n");
+    printf("Artikelnummer | Omschrijving            | Prijs    | Voorraad\n");
+    printf("-------------------------------------------------------------\n");
+
+    // Doorloop het bestand en druk de voorraadlijst af
+    while (fscanf(bestand, "%d,%99[^,],%lf,%d\n", &artikel.artikelnummer, artikel.omschrijving, &artikel.prijs, &artikel.voorraad) != EOF) {
+        printf("%-13d | %-23s | %8.2lf | %8d\n", artikel.artikelnummer, artikel.omschrijving, artikel.prijs, artikel.voorraad);
+    }
+
+    // Sluit het bestand
+    fclose(bestand);
+}
+
+
+// Functie om voorraadmutatie uit te voeren
+void stockUpdate(int artikelNummer, int update) {
+    FILE *bestand;
+    FILE *tijdelijkBestand;
+    struct Artikel artikel;
+    int gevonden = 0;
+
+    // Probeer het bestand te openen voor lezen ("r" modus)
+    bestand = fopen(filename, "r");
+
+    if (bestand == NULL) {
+        printf("Kan het bestand niet openen voor lezen.\n");
+        return;
+    }
+
+    // Maak een tijdelijk bestand om wijzigingen op te slaan
+    tijdelijkBestand = fopen("temp.txt", "w");
+
+    if (tijdelijkBestand == NULL) {
+        printf("Kan het tijdelijke bestand niet aanmaken voor schrijven.\n");
+        fclose(bestand);
+        return;
+    }
+
+    // Doorloop het bestand en zoek naar het artikelnummer
+    while (fscanf(bestand, "%d,%99[^,],%lf,%d\n", &artikel.artikelnummer, artikel.omschrijving, &artikel.prijs, &artikel.voorraad) != EOF) {
+        if (artikel.artikelnummer == artikelNummer) {
+            artikel.voorraad += update;
+            if (artikel.voorraad < 0) {
+                artikel.voorraad = 0; // Voorraad kan niet negatief zijn
+            }
+            gevonden = 1;
+        }
+        fprintf(tijdelijkBestand, "%d,%s,%.2lf,%d\n", artikel.artikelnummer, artikel.omschrijving, artikel.prijs, artikel.voorraad);
+    }
+
+    // Sluit beide bestanden
+    fclose(bestand);
+    fclose(tijdelijkBestand);
+
+    // Verwijder het oorspronkelijke bestand en hernoem het tijdelijke bestand
+    remove(filename);
+    rename("temp.txt", filename);
+
+    if (gevonden) {
+        printf("Voorraadmutatie uitgevoerd voor artikelnummer %d.\n", artikelNummer);
+    } else {
+        printf("Artikel met artikelnummer %d niet gevonden.\n", artikelNummer);
+    }
+}
+
+
+
+//functie om een product te zoeken
+void searchProduct(int artikelNummer) {
+    FILE *bestand;
+    struct Artikel artikel;
+    int artikelGevonden = 0;
+
+    // Probeer het bestand te openen voor lezen ("r" modus)
+    bestand = fopen(filename, "r");
+
+    if (bestand == NULL) {
+        printf("Kan het bestand niet openen voor lezen.\n");
+        return;
+    }
+
+    // Doorloop het bestand en zoek naar het artikelnummer
+    while (fscanf(bestand, "%d,%99[^,],%lf,%d\n", &artikel.artikelnummer, artikel.omschrijving, &artikel.prijs, &artikel.voorraad) != EOF) {
+        if (artikel.artikelnummer == artikelNummer) {
+            printf("Artikelnummer: %d\n", artikel.artikelnummer);
+            printf("Omschrijving: %s\n", artikel.omschrijving);
+            printf("Prijs: %.2lf\n", artikel.prijs);
+            printf("Voorraad: %d\n", artikel.voorraad);
+            artikelGevonden = 1;
+            break; // Artikel gevonden, stop met zoeken
+        }
+    }
+
+    if (!artikelGevonden) {
+        printf("Artikel met artikelnummer %d niet gevonden.\n", artikelNummer);
+    }
+
+    // Sluit het bestand
+    fclose(bestand);
+}
+
+
 //functie voor het bewerken van de dBase in excel
 void editDBase() {
 
@@ -45,6 +165,26 @@ void editDBase() {
 
     return;
 }
+
+void getOmschrijving(char *omschrijving) {
+    
+    do {
+           fflush(stdin);
+           clearScreen();
+           printf("Voer de omschrijving in (maximaal 20 karakters): ");
+           scanf(" %20[^\n]s", omschrijving);
+           if (strlen(omschrijving) > 20) {
+               clearScreen();
+               printf("Waarschuwing: Omschrijving mag maximaal 20 karakters bevatten. Probeer opnieuw.\n");
+          
+            }
+        } while (strlen(omschrijving) > 20);
+        
+        
+        return;
+        }
+
+
 
 //functie voor het aanmaken van artikelen
 int makeProduct() {
@@ -60,15 +200,19 @@ int makeProduct() {
         return 1;
     }
 
+
+
     do {
         clearScreen();
         // Vraag de gebruiker om artikelinformatie in te voeren
         printf("Voer het artikelnummer in: ");
         scanf("%d", &artikel.artikelnummer);
 
-        printf("Voer de omschrijving in: ");
-        scanf(" %[^\n]s", artikel.omschrijving);
+        //printf("Voer de omschrijving in: ");
+        //scanf(" %[^\n]s", artikel.omschrijving);
 
+        getOmschrijving(artikel.omschrijving);
+        
         printf("Voer de prijs in: ");
         scanf("%lf", &artikel.prijs);
 
@@ -79,7 +223,7 @@ int makeProduct() {
         fprintf(bestand, "%d,%s,%.2lf,%d\n", artikel.artikelnummer, artikel.omschrijving, artikel.prijs, artikel.voorraad);
 
         printf("Artikel opgeslagen in het bestand.\n");
-        //Toon de volledige QSO op het scherm
+        //Toon artikel op het scherm
         //Kleur groen
         printf("\e[s");
         printf("\e[32m\e[25;1H\n");
@@ -116,7 +260,7 @@ void makeMenu(){
         printf("1. Zoek Product\n");
         printf("2. Nieuw Product\n");
         printf("3. Print voorraadlijst\n");
-        printf("4. --\n");
+        printf("4. Muteer voorraad\n");
         printf("5. Bewerk de database in Notepad\n");
         printf("0. Exit\n");
         printf("Keuze: ");
@@ -124,26 +268,33 @@ void makeMenu(){
 
         switch (choice) {
             case 1:
-                // Vraag de gebruiker om de Header parameters in te vullen
-                //searchProduct();
-
+                // Zoek artikel op artikelnummer
+                printf("Voer artikelnummer in om te zoeken: ");
+                scanf("%d", &artikelNummer);
+                searchProduct(artikelNummer);
+               
                 break;
 
             case 2:
-                 // Vraag de gebruiker om de QSO parameters in te vullen
+                 // Voeg een product artikel toe
                 makeProduct();
                 
                 break;
 
             case 3:
-                //log afsluiten
-                //printDBase();
+                //print database
+                printDbase();
 
                 break;
             
             case 4:
-                //laat logbook zien
-                
+                //muteer voorraad
+                printf("Voer artikelnummer in voor voorraadmutatie: ");
+                scanf("%d", &artikelNummer);
+                printf("Voer de mutatie in (positief voor verhoging, negatief voor verlaging): ");
+                scanf("%d", &update);
+                stockUpdate(artikelNummer, update);
+                break;
 
                 break;
 
