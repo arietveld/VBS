@@ -57,6 +57,11 @@ void stockUpdate(char filename[20], int artikelNummer, int update) {
     struct Artikel artikel;
     int gevonden = 0;
 
+    printf("Voer artikelnummer in voor voorraadmutatie: ");
+    scanf("%d", &artikelNummer);
+    printf("Voer de mutatie in (positief voor verhoging, negatief voor verlaging): ");
+    scanf("%d", &update);
+
     // Probeer het bestand te openen voor lezen ("r" modus)
     bestand = fopen(filename, "r");
 
@@ -106,6 +111,9 @@ void searchProduct(char filename[20], int artikelNummer) {
     FILE *bestand;
     struct Artikel artikel;
     int artikelGevonden = 0;
+
+    printf("Voer artikelnummer in om te zoeken: ");
+    scanf("%d", &artikelNummer);
 
     // Probeer het bestand te openen voor lezen ("r" modus)
     bestand = fopen(filename, "r");
@@ -252,10 +260,8 @@ void makeMenu(char filename[20], int artikelNummer, int update) {
         switch (choice) {
             case 1:
                 // Zoek artikel op artikelnummer
-                printf("Voer artikelnummer in om te zoeken: ");
-                scanf("%d", &artikelNummer);
                 searchProduct(filename, artikelNummer);
-               
+
                 break;
 
             case 2:
@@ -272,20 +278,14 @@ void makeMenu(char filename[20], int artikelNummer, int update) {
             
             case 4:
                 //muteer voorraad
-                printf("Voer artikelnummer in voor voorraadmutatie: ");
-                scanf("%d", &artikelNummer);
-                printf("Voer de mutatie in (positief voor verhoging, negatief voor verlaging): ");
-                scanf("%d", &update);
                 stockUpdate(filename, artikelNummer, update);
-                break;
-
+                
                 break;
 
             case 5:
                 //bewerk het logboek met notepad
                 editDBase(filename);
-                
-                
+                                
                 break;
 
             case 0:
