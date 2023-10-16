@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "functions.h"
+#include "screenfunctions.h"
 
 char filename[20];
 int artikelNummer;
