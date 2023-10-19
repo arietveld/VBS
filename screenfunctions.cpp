@@ -4,8 +4,9 @@
 #include "functions.h"
 #include "screenfunctions.h"
 
+
 //Functie voor het startmenu
-void makeMenu(char filename[20], int artikelNummer, int update) {
+void startMenu(char klantFile[20], char artikelFile[20]) {
 
     int choice;
 
@@ -13,47 +14,34 @@ void makeMenu(char filename[20], int artikelNummer, int update) {
         clearScreen();
 
         printf("Voorraad Beheer Systeem rel. 0.1\n\n" );
-        printf("Menu:\n");
-        printf("1. Zoek Product\n");
-        printf("2. Nieuw Product\n");
-        printf("3. Print voorraadlijst\n");
-        printf("4. Muteer voorraad\n");
-        printf("5. Bewerk de database in Notepad\n");
+        printf("Start Menu:\n");
+        printf("1. Artikel Menu\n");
+        printf("2. Order Menu\n");
+        printf("3. Klant Menu \n");
+
         printf("0. Exit\n");
         printf("Keuze: ");
         scanf("%d", &choice);
 
         switch (choice) {
             case 1:
-                // Zoek artikel op artikelnummer
-                searchProduct(filename, artikelNummer);
+                // Artikel Menu
+                artikelMenu(artikelFile);
 
                 break;
 
             case 2:
-                 // Voeg een product artikel toe
-                makeProduct(filename);
+                 // Order Menu
+                //orderMenu(orderFile);
                 
                 break;
 
             case 3:
-                //print database
-                printDbase(filename);
+                //Klant Menu
+                klantMenu(klantFile);
 
                 break;
             
-            case 4:
-                //muteer voorraad
-                stockUpdate(filename, artikelNummer, update);
-                
-                break;
-
-            case 5:
-                //bewerk het logboek met notepad
-                editDBase(filename);
-                                
-                break;
-
             case 0:
                 printf("Programma wordt afgesloten.\n");
 

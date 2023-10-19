@@ -2,7 +2,7 @@
 #define SCREENFUNCTIONS_H
 
 //algemene functies
-void makeMenu(char filename[20], int artikelNummer, int update);
+void startMenu(char klantFile[20], char artikelFile[20]);
 void clearScreen();
 void clearHigh();
 

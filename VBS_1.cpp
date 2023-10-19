@@ -4,29 +4,23 @@
 #include "functions.h"
 #include "screenfunctions.h"
 
-char filename[20];
-int artikelNummer;
-int update;
+char orderFile[20];
+char klantFile[20];
+char artikelFile[20];
+
 
 // Bij het starten van het programma moet de filename worden meegegeven
+//probleem oplossen, we hebben 3 bestanden nodig; order,artikel en klantbestand
+//deze leggen we nu eerst vast 
 
-int main(int argc, char *argv[]){
+int main(){
 
+char klantFile[20] = "klantfile.txt";
+char artikelFile[20] = "artikelfile.txt";
+char orderFile[20] = "orderfile";
 
-
-    if (argc == 2) {
-    strcpy(filename, argv[1]);
-    
-    }
-    else {
-        printf("Geef de naam van het bestand: \n");
-        scanf("%s",filename);
-    }
-    
-    
-    fflush(stdin);
-
-    makeMenu(filename, artikelNummer, update);
+//start het hoofdmenu
+    startMenu(klantFile, artikelFile);
         
     return 0;
 }
